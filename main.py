@@ -30,7 +30,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    bot.owner_id = 122800503846338563
+    bot.owner_id = bot_config.BOT_OWNER
 
 
 @tree.error
