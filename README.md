@@ -131,6 +131,7 @@ longer log new messages, edits, and deletions.
 
 To-Do
 ================
+* [ ] Find a better name for this project so it doesn't conflict with an existing [Discord bot](https://statbot.net/)
 * [ ] Refactor `wordcloud` and `msgcount` commands into subcommands and to use discord.py Converters. This will enable 
 more methods of specifying user and channel targets such as in the `vocab` command.
 * [ ] Rewrite commands to work with slash commands
