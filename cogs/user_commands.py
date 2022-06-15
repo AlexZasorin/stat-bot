@@ -19,7 +19,7 @@ from wordcloud import STOPWORDS, ImageColorGenerator
 from cogs import constant
 from core import utility
 from core.statbot import StatBot
-from core.utility import get_conn, STATUS
+from core.utility import get_conn, Status
 
 
 class WcParams(TypedDict):
@@ -157,17 +157,17 @@ class UserCommands(commands.Cog):
     def __init__(self, bot: StatBot):
         self.bot = bot
 
-    async def _handle_server_status_response(self, ctx: discord.ext.commands.Context, server_status: STATUS):
-        if server_status != STATUS.AVAILABLE:
-            if server_status == STATUS.IMPORTING:
+    async def _handle_server_status_response(self, ctx: discord.ext.commands.Context, server_status: Status):
+        if server_status != Status.AVAILABLE:
+            if server_status == Status.IMPORTING:
                 await ctx.send(constant.RESPONSES['server_importing'])
             else:
                 await ctx.send(constant.RESPONSES['server_not_added'])
             return
 
-    async def _handle_channel_status_response(self, ctx: discord.ext.commands.Context, channel_status: STATUS):
-        if channel_status != STATUS.AVAILABLE:
-            if channel_status == STATUS.IMPORTING:
+    async def _handle_channel_status_response(self, ctx: discord.ext.commands.Context, channel_status: Status):
+        if channel_status != Status.AVAILABLE:
+            if channel_status == Status.IMPORTING:
                 await ctx.send(constant.RESPONSES['channel_importing'])
             else:
                 await ctx.send(constant.RESPONSES['channel_not_added'])
@@ -292,7 +292,7 @@ class UserCommands(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != STATUS.AVAILABLE:
+                if server_status != Status.AVAILABLE:
                     return
 
                 params = await self._process_wordcloud_args(ctx, args)
@@ -376,7 +376,7 @@ class UserCommands(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != STATUS.AVAILABLE:
+                if server_status != Status.AVAILABLE:
                     return
 
                 target, channel = await self._process_msgcount_args(ctx, args)
@@ -402,7 +402,7 @@ class UserCommands(commands.Cog):
                 else:
                     channel_status = await utility.channel_status(conn, ctx.channel)
                     await self._handle_channel_status_response(ctx, channel_status)
-                    if channel_status != STATUS.AVAILABLE:
+                    if channel_status != Status.AVAILABLE:
                         return
 
                     msg_count = await conn.fetchrow(
