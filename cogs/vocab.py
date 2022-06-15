@@ -19,7 +19,7 @@ from num2words import num2words
 from cogs import constant
 from core import utility
 from core.statbot import StatBot
-from core.utility import get_conn, Status
+from core.utility import get_conn, STATUS
 
 
 # noinspection PyMethodMayBeStatic
@@ -272,17 +272,17 @@ class Vocab(commands.Cog):
 
         return ret
 
-    async def _handle_server_status_response(self, ctx: discord.ext.commands.Context, server_status: Status) -> None:
-        if server_status != Status.AVAILABLE:
-            if server_status == Status.IMPORTING:
+    async def _handle_server_status_response(self, ctx: discord.ext.commands.Context, server_status: STATUS) -> None:
+        if server_status != STATUS.AVAILABLE:
+            if server_status == STATUS.IMPORTING:
                 await ctx.send(constant.RESPONSES['server_importing'])
             else:
                 await ctx.send(constant.RESPONSES['server_not_added'])
             return
 
-    async def _handle_channel_status_response(self, ctx: discord.ext.commands.Context, channel_status: Status) -> None:
-        if channel_status != Status.AVAILABLE:
-            if channel_status == Status.IMPORTING:
+    async def _handle_channel_status_response(self, ctx: discord.ext.commands.Context, channel_status: STATUS) -> None:
+        if channel_status != STATUS.AVAILABLE:
+            if channel_status == STATUS.IMPORTING:
                 await ctx.send(constant.RESPONSES['channel_importing'])
             else:
                 await ctx.send(constant.RESPONSES['channel_not_added'])
@@ -442,13 +442,13 @@ class Vocab(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != Status.AVAILABLE:
+                if server_status != STATUS.AVAILABLE:
                     return
 
                 if channel_target:
                     channel_status = await utility.channel_status(conn, ctx.channel)
                     await self._handle_channel_status_response(ctx, channel_status)
-                    if channel_status != Status.AVAILABLE:
+                    if channel_status != STATUS.AVAILABLE:
                         return
 
                     df = await self._get_agg_msgs(conn, ctx.guild.id, channel_id=channel_target.id)
@@ -526,13 +526,13 @@ class Vocab(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != Status.AVAILABLE:
+                if server_status != STATUS.AVAILABLE:
                     return
 
                 if channel_target:
                     channel_status = await utility.channel_status(conn, ctx.channel)
                     await self._handle_channel_status_response(ctx, channel_status)
-                    if channel_status != Status.AVAILABLE:
+                    if channel_status != STATUS.AVAILABLE:
                         return
 
                     df = await self._get_agg_msgs(conn, ctx.guild.id, channel_id=channel_target.id)
@@ -598,13 +598,13 @@ class Vocab(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != Status.AVAILABLE:
+                if server_status != STATUS.AVAILABLE:
                     return
 
                 if channel_target:
                     channel_status = await utility.channel_status(conn, ctx.channel)
                     await self._handle_channel_status_response(ctx, channel_status)
-                    if channel_status != Status.AVAILABLE:
+                    if channel_status != STATUS.AVAILABLE:
                         return
 
                     df = await self._get_agg_msgs(conn, ctx.guild.id, channel_id=channel_target.id)
@@ -701,13 +701,13 @@ class Vocab(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != Status.AVAILABLE:
+                if server_status != STATUS.AVAILABLE:
                     return
 
                 if channel_target:
                     channel_status = await utility.channel_status(conn, ctx.channel)
                     await self._handle_channel_status_response(ctx, channel_status)
-                    if channel_status != Status.AVAILABLE:
+                    if channel_status != STATUS.AVAILABLE:
                         return
 
                     df = await self._get_agg_msgs(conn, ctx.guild.id, channel_id=channel_target.id, user_id=user_target.id)
@@ -774,13 +774,13 @@ class Vocab(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != Status.AVAILABLE:
+                if server_status != STATUS.AVAILABLE:
                     return
 
                 if channel_target:
                     channel_status = await utility.channel_status(conn, ctx.channel)
                     await self._handle_channel_status_response(ctx, channel_status)
-                    if channel_status != Status.AVAILABLE:
+                    if channel_status != STATUS.AVAILABLE:
                         return
 
                     df_grade = await self._get_agg_msgs_grade(
@@ -819,13 +819,13 @@ class Vocab(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != Status.AVAILABLE:
+                if server_status != STATUS.AVAILABLE:
                     return
 
                 if channel_target:
                     channel_status = await utility.channel_status(conn, ctx.channel)
                     await self._handle_channel_status_response(ctx, channel_status)
-                    if channel_status != Status.AVAILABLE:
+                    if channel_status != STATUS.AVAILABLE:
                         return
 
                     df = await self._get_agg_msgs(conn, ctx.guild.id, channel_id=channel_target.id)
@@ -879,13 +879,13 @@ class Vocab(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != Status.AVAILABLE:
+                if server_status != STATUS.AVAILABLE:
                     return
 
                 if channel_target:
                     channel_status = await utility.channel_status(conn, ctx.channel)
                     await self._handle_channel_status_response(ctx, channel_status)
-                    if channel_status != Status.AVAILABLE:
+                    if channel_status != STATUS.AVAILABLE:
                         return
 
                     df = await self._get_agg_msgs(conn, ctx.guild.id, channel_id=channel_target.id)
@@ -928,13 +928,13 @@ class Vocab(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != Status.AVAILABLE:
+                if server_status != STATUS.AVAILABLE:
                     return
 
                 if channel_target:
                     channel_status = await utility.channel_status(conn, ctx.channel)
                     await self._handle_channel_status_response(ctx, channel_status)
-                    if channel_status != Status.AVAILABLE:
+                    if channel_status != STATUS.AVAILABLE:
                         return
 
                     df = await self._get_agg_msgs(conn, ctx.guild.id, channel_id=channel_target.id)
@@ -977,13 +977,13 @@ class Vocab(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != Status.AVAILABLE:
+                if server_status != STATUS.AVAILABLE:
                     return
 
                 if channel_target:
                     channel_status = await utility.channel_status(conn, ctx.channel)
                     await self._handle_channel_status_response(ctx, channel_status)
-                    if channel_status != Status.AVAILABLE:
+                    if channel_status != STATUS.AVAILABLE:
                         return
 
                     df = await self._get_agg_msgs(conn, ctx.guild.id, channel_id=channel_target.id)
@@ -1026,13 +1026,13 @@ class Vocab(commands.Cog):
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
                 await self._handle_server_status_response(ctx, server_status)
-                if server_status != Status.AVAILABLE:
+                if server_status != STATUS.AVAILABLE:
                     return
 
                 if channel_target:
                     channel_status = await utility.channel_status(conn, ctx.channel)
                     await self._handle_channel_status_response(ctx, channel_status)
-                    if channel_status != Status.AVAILABLE:
+                    if channel_status != STATUS.AVAILABLE:
                         return
 
                     df_grade = await self._get_agg_msgs_grade(conn, ctx.guild.id, channel_id=channel_target.id)

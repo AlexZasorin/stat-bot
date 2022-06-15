@@ -43,13 +43,13 @@ async def fetch_as_dataframe(con: asyncpg.Connection, query: str, *args):
     return pd.DataFrame(columns=columns, data=data)
 
 
-class Status(Enum):
+class STATUS(Enum):
     AVAILABLE = 1
     NOT_ADDED = 2
     IMPORTING = 3
 
 
-async def server_status(conn: asyncpg.Connection, server: discord.Guild, lock_for_update: bool = False) -> Status:
+async def server_status(conn: asyncpg.Connection, server: discord.Guild, lock_for_update: bool = False) -> STATUS:
     if lock_for_update:
         row = await conn.fetchrow(
             'SELECT Importing '
@@ -66,16 +66,16 @@ async def server_status(conn: asyncpg.Connection, server: discord.Guild, lock_fo
         )
 
     if not row:
-        return Status.NOT_ADDED
+        return STATUS.NOT_ADDED
     elif row['importing'] is True:
-        return Status.IMPORTING
+        return STATUS.IMPORTING
 
-    return Status.AVAILABLE
+    return STATUS.AVAILABLE
 
 
 async def channel_status(
         conn: asyncpg.Connection, channel: discord.TextChannel, lock_for_update: bool = False
-) -> Status:
+) -> STATUS:
     if lock_for_update:
         row = await conn.fetchrow(
             'SELECT Importing '
@@ -92,8 +92,8 @@ async def channel_status(
         )
 
     if not row:
-        return Status.NOT_ADDED
+        return STATUS.NOT_ADDED
     elif row['importing'] is True:
-        return Status.IMPORTING
+        return STATUS.IMPORTING
 
-    return Status.AVAILABLE
+    return STATUS.AVAILABLE
