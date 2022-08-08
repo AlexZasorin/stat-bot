@@ -2,8 +2,8 @@
 BOT_TOKEN = ''
 # ex: h!
 BOT_PREFIX = ''
-# your Discord user ID here
-BOT_OWNER = ''
+# your Discord user ID here as an int
+BOT_OWNER = 11111111111111
 
 # name you chose for DB when you generated the schema, likely "statbot_db"
 DB = ''
