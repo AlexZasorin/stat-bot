@@ -157,7 +157,7 @@ class UserCommands(commands.Cog):
     def __init__(self, bot: StatBot):
         self.bot = bot
 
-    async def _handle_server_status_response(self, ctx: discord.ext.commands.Context, server_status: Status):
+    async def _handle_server_status_response(self, ctx: discord.ext.commands.Context, server_status: Status) -> None:
         if server_status != Status.AVAILABLE:
             if server_status == Status.IMPORTING:
                 await ctx.send(constant.RESPONSES['server_importing'])
@@ -165,7 +165,7 @@ class UserCommands(commands.Cog):
                 await ctx.send(constant.RESPONSES['server_not_added'])
             return
 
-    async def _handle_channel_status_response(self, ctx: discord.ext.commands.Context, channel_status: Status):
+    async def _handle_channel_status_response(self, ctx: discord.ext.commands.Context, channel_status: Status) -> None:
         if channel_status != Status.AVAILABLE:
             if channel_status == Status.IMPORTING:
                 await ctx.send(constant.RESPONSES['channel_importing'])

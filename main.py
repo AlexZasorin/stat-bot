@@ -1,14 +1,14 @@
 import asyncio
 import sys
-from typing import Union, Optional
+from typing import Optional
 
 import discord
+from discord import Interaction
+from discord.app_commands import AppCommandError
 
 import cogs.block
 from core import bot_config
 from core.statbot import StatBot
-from discord import Interaction
-from discord.app_commands import Command, ContextMenu, AppCommandError
 
 description = '''Bot focused on statistics/data for both utility and fun.'''
 

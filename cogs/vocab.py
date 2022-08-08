@@ -24,7 +24,7 @@ from core.utility import get_conn, Status
 
 # noinspection PyMethodMayBeStatic
 class Vocab(commands.Cog):
-    def __init__(self, bot: StatBot):
+    def __init__(self, bot: StatBot) -> None:
         self.bot = bot
         self.words = None
         self.nltk_words = None
@@ -32,7 +32,7 @@ class Vocab(commands.Cog):
         self.most_common_words = None
         self.wnl = None
 
-    def vocab_data_init(self):
+    def vocab_data_init(self) -> None:
         self.wnl = WordNetLemmatizer()
 
         print('NLTK: Downloading \"words\" dataset...')
@@ -85,7 +85,7 @@ class Vocab(commands.Cog):
     async def cog_load(self) -> None:
         await self.bot.loop.run_in_executor(None, self.vocab_data_init)
 
-    def _clean_content(self, msg_str):
+    def _clean_content(self, msg_str: str) -> str:
         lower_case = msg_str.lower()
         remove_urls = constant.REGEX['urls'].sub('', lower_case)
         remove_user = constant.REGEX['user_mention'].sub('', remove_urls)
@@ -96,7 +96,7 @@ class Vocab(commands.Cog):
 
         return remove_punctuation
 
-    def _unique_words(self, msg_list):
+    def _unique_words(self, msg_list: list) -> str:
         msg_set = set(msg_list)
         msg_set = {w for w in msg_set if w in self.words}
 
@@ -104,10 +104,10 @@ class Vocab(commands.Cog):
 
         return ' '.join(msg_set)
 
-    def _filter_common_words(self, msg_list):
+    def _filter_common_words(self, msg_list: list) -> str:
         return ' '.join([w for w in msg_list if w not in self.most_common_words])
 
-    def _unique_words_per_user(self, dfr, author, less_common_words):
+    def _unique_words_per_user(self, dfr: pd.DataFrame, author: int, less_common_words: str) -> str:
         complement_set = set(dfr.less_common_words.loc[dfr.authorid != author].str.split().explode())
         author_set = set(less_common_words.split())
 
@@ -115,7 +115,7 @@ class Vocab(commands.Cog):
 
         return ' '.join(result_set)
 
-    def _clean_leave_punctuation(self, msg_str):
+    def _clean_leave_punctuation(self, msg_str: list) -> str:
         remove_urls = constant.REGEX['urls'].sub('', msg_str)
         remove_user = constant.REGEX['user_mention'].sub('', remove_urls)
         remove_channel = constant.REGEX['channel_mention'].sub('', remove_user)
@@ -521,7 +521,7 @@ class Vocab(commands.Cog):
             ctx: commands.Context,
             arg1: Optional[Union[discord.Member, discord.TextChannel]],
             arg2: Optional[Union[discord.Member, discord.TextChannel]]
-    ):
+    ) -> None:
         await self._check_vocab_args(arg1, arg2)
 
         (user_target, channel_target) = await self._assign_args(ctx, arg1, arg2)
@@ -593,7 +593,7 @@ class Vocab(commands.Cog):
             ctx: commands.Context,
             arg1: Optional[Union[discord.Member, discord.TextChannel]],
             arg2: Optional[Union[discord.Member, discord.TextChannel]]
-    ):
+    ) -> None:
         await self._check_vocab_args(arg1, arg2)
 
         (user_target, channel_target) = await self._assign_args(ctx, arg1, arg2)
@@ -649,7 +649,7 @@ class Vocab(commands.Cog):
 
         return int_df
 
-    def _interesting(self, data: pd.DataFrame):
+    def _interesting(self, data: pd.DataFrame) -> pd.DataFrame:
         vocab_ranking = self._unique_words_col(data)
 
         server_words_df = pd.DataFrame(columns=['word'],
@@ -696,7 +696,7 @@ class Vocab(commands.Cog):
             ctx: commands.Context,
             arg1: Optional[Union[discord.Member, discord.TextChannel]],
             arg2: Optional[Union[discord.Member, discord.TextChannel]]
-    ):
+    ) -> None:
         await self._check_vocab_args(arg1, arg2)
 
         (user_target, channel_target) = await self._assign_args(ctx, arg1, arg2)
@@ -751,7 +751,7 @@ class Vocab(commands.Cog):
 
         return server_grade_level
 
-    async def _add_grade_field(self, summary: discord.Embed, grade: float, server: bool = False):
+    async def _add_grade_field(self, summary: discord.Embed, grade: float, server: bool = False) -> None:
         grade_ordinal_num = num2words(int(grade), to='ordinal_num')
         grade_ordinal = num2words(int(grade), to='ordinal')
         a_or_an = 'a' if grade_ordinal[0] not in ('a', 'e', 'i', 'o', 'u') else 'an'
@@ -769,7 +769,7 @@ class Vocab(commands.Cog):
             ctx: commands.Context,
             arg1: Optional[Union[discord.Member, discord.TextChannel]],
             arg2: Optional[Union[discord.Member, discord.TextChannel]]
-    ):
+    ) -> None:
         await self._check_vocab_args(arg1, arg2)
 
         (user_target, channel_target) = await self._assign_args(ctx, arg1, arg2)
@@ -1060,15 +1060,15 @@ class Vocab(commands.Cog):
         await ctx.send(embed=summary)
 
     @vocab_server.group(name='global', invoke_without_command=True)
-    async def vocab_server_global(self, ctx: commands.Context):
+    async def vocab_server_global(self, ctx: commands.Context) -> None:
         await ctx.send(inspect.stack()[0][3])
 
     @vocab_server_global.command(name='ranking')
-    async def vocab_server_global_ranking(self, ctx: commands.Context):
+    async def vocab_server_global_ranking(self, ctx: commands.Context) -> None:
         await ctx.send(inspect.stack()[0][3])
 
     @vocab_server_global.command(name='unique')
-    async def vocab_server_global_unique(self, ctx: commands.Context):
+    async def vocab_server_global_unique(self, ctx: commands.Context) -> None:
         await ctx.send(inspect.stack()[0][3])
 
 

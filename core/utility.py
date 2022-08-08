@@ -25,7 +25,7 @@ async def get_image_array(loop, image_name):
 
 
 @asynccontextmanager
-async def get_conn(bot: StatBot):
+async def get_conn(bot: StatBot) -> None:
     # ENTER SECTION
     conn = await bot.pool.acquire()
 
@@ -36,7 +36,7 @@ async def get_conn(bot: StatBot):
         await bot.pool.release(connection=conn)
 
 
-async def fetch_as_dataframe(con: asyncpg.Connection, query: str, *args):
+async def fetch_as_dataframe(con: asyncpg.Connection, query: str, *args: str) -> pd.DataFrame:
     stmt = await con.prepare(query)
     columns = [a.name for a in stmt.get_attributes()]
     data = await stmt.fetch(*args)

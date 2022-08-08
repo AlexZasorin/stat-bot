@@ -13,7 +13,7 @@ def marco(response: str):
 
 
 class StatBot(commands.Bot):
-    def __init__(self, description: str, pm_help: bool, intents: discord.Intents):
+    def __init__(self, description: str, pm_help: bool, intents: discord.Intents) -> None:
         super().__init__(
             command_prefix=bot_config.BOT_PREFIX,
             description=description,
