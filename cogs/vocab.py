@@ -39,6 +39,10 @@ class Vocab(commands.Cog):
         nltk.download('words', quiet=True)
         print('NLTK: Downloading \"names\" dataset...')
         nltk.download('names', quiet=True)
+        print('NLTK: Downloading \"wordnet\" dataset...')
+        nltk.download('wordnet', quiet=True)
+        print('NLTK: Downloading \"omw-1.4\" dataset...')
+        nltk.download('omw-1.4', quiet=True)
         print('NLTK: Done')
 
         ud = pd.read_csv('datasets/urbandict-word-defs.csv', on_bad_lines='skip')
