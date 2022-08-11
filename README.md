@@ -14,8 +14,9 @@ section for details. The prefix `h!` is used throughout this README as an exampl
 ## msgcount
 This command counts messages sent by a user in the server or a channel.
 
-You can specify a user by @ mentioning them. Similarly, you can specify a channel by using a # channel mention. If 
-unspecified, the bot will assume the command user as the target and the entire server as the scope.
+You can specify a user by ID, @ mention, name#discrim, or just name. Names with spaces must be in quotes. Similarly, 
+you can specify a channel by using an ID, # mention, or name. If unspecified, the bot will assume the command user as 
+the target and the entire server as the scope.
 
 ![](readme_images/Discord_rhuDaEEUaE.png)<!-- -->
 ## wordcloud
