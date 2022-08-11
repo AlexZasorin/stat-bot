@@ -3,7 +3,7 @@ import os
 import re
 import time
 from functools import partial
-from typing import Optional, TypedDict
+from typing import Optional, TypedDict, Union
 
 import PIL
 import aiofiles
@@ -12,6 +12,7 @@ import numpy as np
 import requests
 import wordcloud as wc
 from PIL import Image, ImageEnhance
+from discord import Member, TextChannel
 from discord.ext import commands
 from scipy.ndimage import gaussian_gradient_magnitude
 from wordcloud import STOPWORDS, ImageColorGenerator
@@ -265,26 +266,27 @@ class UserCommands(commands.Cog):
 
         return joined_msgs
 
-    async def _process_msgcount_args(
-            self, ctx: commands.Context, args: tuple[str]) -> Optional[tuple[discord.Member, discord.TextChannel]]:
-        target = ctx.author
-        channel = None
-        for arg in args:
-            try:
-                result = await self._find_user_from_str(ctx, arg)
-                target = result if result else target
-            except commands.errors.BadArgument:
-                await ctx.send('Sorry, I can\'t seem to find that user.')
-                return None
+    async def _assign_args(
+            self,
+            ctx: discord.ext.commands.Context,
+            arg1: Optional[Union[discord.Member, discord.TextChannel]],
+            arg2: Optional[Union[discord.Member, discord.TextChannel]]
+    ) -> tuple[Union[Member, TextChannel], Union[TextChannel, Member, None]]:
+        user_target = ctx.author
+        channel_target = None
+        if arg1:
+            if isinstance(arg1, discord.Member):
+                # arg1 is a Member obj and arg2 is (potentially) a TextChannel obj
+                user_target = arg1
+                if arg2:
+                    channel_target = arg2
+            else:
+                # arg1 is a TextChannel obj and arg2 (potentially) is a Member obj
+                channel_target = arg1
+                if arg2:
+                    user_target = arg2
 
-            try:
-                result = await self._find_channel_from_str(ctx, arg)
-                channel = result if result else channel
-            except commands.errors.BadArgument:
-                await ctx.send('Sorry, I can\'t seem to find that channel.')
-                return None
-
-        return target, channel
+        return user_target, channel_target
 
     @commands.command(name='wordcloud')
     async def wordcloud(self, ctx: commands.Context, *args: str) -> None:
@@ -371,7 +373,12 @@ class UserCommands(commands.Cog):
                     await bot_response.delete()
 
     @commands.command(name='msgcount')
-    async def msgcount(self, ctx: commands.Context, *args: str) -> None:
+    async def msgcount(
+            self,
+            ctx: commands.Context,
+            arg1: Optional[Union[discord.Member, discord.TextChannel]],
+            arg2: Optional[Union[discord.Member, discord.TextChannel]]
+    ) -> None:
         async with get_conn(self.bot) as conn:
             async with conn.transaction():
                 server_status = await utility.server_status(conn, ctx.guild)
@@ -379,7 +386,7 @@ class UserCommands(commands.Cog):
                 if server_status != Status.AVAILABLE:
                     return
 
-                target, channel = await self._process_msgcount_args(ctx, args)
+                (target, channel) = await self._assign_args(ctx, arg1, arg2)
                 if target is None:
                     return
 
