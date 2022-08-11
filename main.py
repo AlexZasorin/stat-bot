@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import sys
 from typing import Optional
 
@@ -9,6 +10,8 @@ from discord.app_commands import AppCommandError
 import cogs.block
 from core import bot_config
 from core.statbot import StatBot
+
+logging.basicConfig(level=logging.WARNING)
 
 description = '''Bot focused on statistics/data for both utility and fun.'''
 
