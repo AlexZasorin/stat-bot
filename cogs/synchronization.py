@@ -5,14 +5,17 @@ import time
 import asyncpg
 import dateutil.parser
 import discord
+from discord.ext import commands
+
 from core.statbot import StatBot
 from core.utility import get_conn
-from discord.ext import commands
 
 
 class Synchronization(commands.Cog):
     def __init__(self, bot: StatBot) -> None:
         self.bot = bot
+        self.log = logging.getLogger('statbot')
+        self.log.setLevel(level=logging.INFO)
 
     async def _remove_text_channel(self, channel: discord.TextChannel) -> None:
         async with get_conn(self.bot) as conn:
@@ -176,9 +179,9 @@ class Synchronization(commands.Cog):
     async def _log_message(self, message: discord.Message) -> None:
         async with get_conn(self.bot) as conn:
             if message.type != discord.MessageType.default and message.type != discord.MessageType.reply:
-                logging.info('FAILED TO LOG MESSAGE: Type not default or reply')
-                logging.debug(message)
-                logging.debug('Message content: {}'.format(message.content))
+                self.log.info('FAILED TO LOG MESSAGE: Type not default or reply')
+                self.log.debug(message)
+                self.log.debug('Message content: {}'.format(message.content))
                 return
 
             async with conn.transaction():
@@ -312,9 +315,9 @@ class Synchronization(commands.Cog):
         async with conn.transaction():
             async for message in text_channel.history(limit=None):
                 if message.type != discord.MessageType.default and message.type != discord.MessageType.reply:
-                    logging.info('FAILED TO LOG MESSAGE: Type not default or reply')
-                    logging.debug(message)
-                    logging.debug('Message content: {}'.format(message.content))
+                    self.log.info('FAILED TO LOG MESSAGE: Type not default or reply')
+                    self.log.debug(message)
+                    self.log.debug('Message content: {}'.format(message.content))
                     continue
 
                 attachment_url_list = [attachment.url for attachment in message.attachments]
