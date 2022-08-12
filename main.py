@@ -11,7 +11,8 @@ import cogs.block
 from core import bot_config
 from core.statbot import StatBot
 
-logging.basicConfig(level=logging.WARNING)
+logging.getLogger('discord').setLevel(logging.WARNING)
+logging.basicConfig(level=logging.DEBUG)
 
 description = '''Bot focused on statistics/data for both utility and fun.'''
 
