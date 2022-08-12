@@ -7,15 +7,10 @@ class DevCommands(commands.Cog):
     def __init__(self, bot: StatBot) -> None:
         self.bot = bot
 
-    async def _shutdown_bot(self, restart: bool = False, wait_empty_queue: bool = True) -> None:
+    async def _shutdown_bot(self, restart: bool = False) -> None:
         print('Shutting the bot down')
 
         self.bot.shutting_down = True
-
-        if wait_empty_queue and not self.bot.del_queue_empty.is_set():
-            print('Waiting for empty queue...')
-            await self.bot.del_queue_empty.wait()
-            print('Message queue is empty')
 
         if restart:
             self.bot.exit_code = 2
@@ -52,11 +47,7 @@ class DevCommands(commands.Cog):
     async def shutdown(self, ctx: commands.Context, *args: str) -> None:
         await ctx.send('Goodbye!')
 
-        wait_empty_queue = True
-        if len(args) != 0:
-            wait_empty_queue = args[0] != 'no-wait'
-
-        await self._shutdown_bot(restart=False, wait_empty_queue=wait_empty_queue)
+        await self._shutdown_bot(restart=False)
 
     @commands.command(hidden=True)
     @commands.is_owner()

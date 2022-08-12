@@ -32,9 +32,6 @@ class StatBot(commands.Bot):
 
         self.process_executor = None
 
-        self.del_queue_empty = asyncio.Event()
-        self.del_queue_empty.set()
-
         self.shutting_down = False
 
         self.exit_code = 0
