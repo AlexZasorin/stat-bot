@@ -1,4 +1,5 @@
 import datetime
+import logging
 import time
 
 import asyncpg
@@ -174,8 +175,10 @@ class Synchronization(commands.Cog):
 
     async def _log_message(self, message: discord.Message) -> None:
         async with get_conn(self.bot) as conn:
-            if str(message.type) != 'MessageType.default':
-                # print('FAILED TO LOG MESSAGE: Message type not default')
+            if message.type != discord.MessageType.default and message.type != discord.MessageType.reply:
+                logging.info('FAILED TO LOG MESSAGE: Type not default or reply')
+                logging.debug(message)
+                logging.debug('Message content: {}'.format(message.content))
                 return
 
             async with conn.transaction():
@@ -202,7 +205,7 @@ class Synchronization(commands.Cog):
                 await conn.execute(
                     'INSERT INTO statbot_db.MESSAGES VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
                     message.id,
-                    message.reference,
+                    None if not message.reference else message.reference.message_id,
                     message.content,
                     attachment_url_list,
                     message.created_at,
@@ -308,15 +311,17 @@ class Synchronization(commands.Cog):
 
         async with conn.transaction():
             async for message in text_channel.history(limit=None):
-                if str(message.type) != 'MessageType.default':
-                    # print('FAILED TO LOG MESSAGE: Type not default')
+                if message.type != discord.MessageType.default and message.type != discord.MessageType.reply:
+                    logging.info('FAILED TO LOG MESSAGE: Type not default or reply')
+                    logging.debug(message)
+                    logging.debug('Message content: {}'.format(message.content))
                     continue
 
                 attachment_url_list = [attachment.url for attachment in message.attachments]
 
                 msg_queue.append([
                     message.id,
-                    message.reference,
+                    None if not message.reference else message.reference.message_id,
                     message.content,
                     attachment_url_list,
                     message.created_at,
