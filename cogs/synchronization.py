@@ -27,7 +27,8 @@ class Synchronization(commands.Cog):
                 )
 
                 if not rows:
-                    print('FAILED TO REMOVE CHANNEL: Channel not in DB')
+                    self.log.info('FAILED TO REMOVE CHANNEL: Channel not in DB')
+                    self.log.debug(channel)
                     return
 
                 await conn.execute(
@@ -46,7 +47,9 @@ class Synchronization(commands.Cog):
                 )
 
                 if not rows:
-                    print('FAILED TO ADD CHANNEL: Server not in DB')
+                    self.log.info('FAILED TO ADD CHANNEL: Server not in DB')
+                    self.log.debug(channel.guild)
+                    self.log.debug(channel)
                     return
 
                 await conn.execute(
@@ -76,7 +79,9 @@ class Synchronization(commands.Cog):
                 )
 
                 if not rows:
-                    print('FAILED TO ADD USER: Server not in DB')
+                    self.log.info('FAILED TO ADD USER: Server not in DB')
+                    self.log.debug(member.guild)
+                    self.log.debug(member)
                     return
 
                 try:
@@ -86,8 +91,8 @@ class Synchronization(commands.Cog):
                         False
                     )
                 except asyncpg.UniqueViolationError as e:
-                    print(e)
-                    print('User already exists in DB (EXPECTED)')
+                    self.log.info('User already exists in DB (EXPECTED)')
+                    self.log.debug(e)
 
                 try:
                     await conn.execute(
@@ -96,7 +101,7 @@ class Synchronization(commands.Cog):
                         member.id
                     )
                 except asyncpg.UniqueViolationError as e:
-                    print(e)
+                    self.log.debug(e)
                     return
 
     async def _remove_user(self, member: discord.Member) -> None:
@@ -108,7 +113,9 @@ class Synchronization(commands.Cog):
                     member.guild.id
                 )
                 if not rows:
-                    print('FAILED TO REMOVE USER: Server not in DB')
+                    self.log.info('FAILED TO REMOVE USER: Server not in DB')
+                    self.log.debug(member.guild)
+                    self.log.debug(member)
                     return
 
                 try:
@@ -119,7 +126,7 @@ class Synchronization(commands.Cog):
                         member.guild.id
                     )
                 except Exception as e:
-                    print('{!r}: errno is {}'.format(e, e.args[0]))
+                    self.log.error('{!r}: errno is {}'.format(e, e.args[0]))
                     return
 
     async def _delete_message(self, message_id: int) -> None:
@@ -131,8 +138,9 @@ class Synchronization(commands.Cog):
                     message_id
                 )
             except Exception as e:
-                print('FAILED TO DELETE MESSAGE: Message is not in DB.')
-                print(e)
+                self.log.info('FAILED TO DELETE MESSAGE: Message is not in DB.')
+                self.log.debug(message_id)
+                self.log.debug('{!r}: errno is {}'.format(e, e.args[0]))
                 return
 
     async def _bulk_delete_message(self, message_ids: set[int]) -> None:
@@ -145,10 +153,11 @@ class Synchronization(commands.Cog):
                         message_id
                     )
                 except Exception as e:
-                    print('FAILED TO BULK DELETE MESSAGE: Message is not in DB')
-                    print(e)
+                    self.log.info('FAILED TO BULK DELETE MESSAGE: Message is not in DB')
+                    self.log.debug(message_id)
+                    self.log.debug('{!r}: errno is {}'.format(e, e.args[0]))
                     continue
-                print('Bulk message deleted: ' + str(message_id))
+                self.log.info('Bulk message deleted: ' + str(message_id))
 
     async def _update_message(self, message_id: int, content: str, edited_timestamp: datetime.datetime) -> None:
         async with get_conn(self.bot) as conn:
@@ -159,7 +168,8 @@ class Synchronization(commands.Cog):
                     message_id
                 )
                 if not rows:
-                    print('FAILED TO UPDATE MESSAGE: Message is not in DB')
+                    self.log.info('FAILED TO UPDATE MESSAGE: Message is not in DB')
+                    self.log.debug(message_id)
                     return
 
                 try:
@@ -172,8 +182,8 @@ class Synchronization(commands.Cog):
                         message_id
                     )
                 except Exception as e:
-                    print('FAILED TO UPDATE MESSAGE: Message is not in DB')
-                    print(e)
+                    self.log.info('FAILED TO UPDATE MESSAGE: Message is not in DB')
+                    self.log.debug(message_id)
                     return
 
     async def _log_message(self, message: discord.Message) -> None:
@@ -191,7 +201,9 @@ class Synchronization(commands.Cog):
                     message.guild.id
                 )
                 if not rows:
-                    print('FAILED TO LOG MESSAGE: Server not in DB')
+                    self.log.info('FAILED TO LOG MESSAGE: Server not in DB')
+                    self.log.debug(message)
+                    self.log.debug(message.guild)
                     return
 
                 rows = await conn.fetch(
@@ -200,7 +212,9 @@ class Synchronization(commands.Cog):
                     message.channel.id
                 )
                 if not rows:
-                    print('FAILED TO LOG MESSAGE: Channel not yet added')
+                    self.log.info('FAILED TO LOG MESSAGE: Channel not yet added')
+                    self.log.debug(message)
+                    self.log.debug(message.channel)
                     return
 
                 attachment_url_list = [attachment.url for attachment in message.attachments]
@@ -229,7 +243,7 @@ class Synchronization(commands.Cog):
         channel = self.bot.get_channel(payload.channel_id)
         if (isinstance(channel, discord.DMChannel) or
                 isinstance(channel, discord.GroupChannel)):
-            print('FAILED TO DELETE MESSAGE: Ignoring DMChannel/GroupChannel')
+            self.log.info('FAILED TO DELETE MESSAGE: Ignoring DMChannel/GroupChannel')
             return
 
         await self._delete_message(payload.message_id)
@@ -243,12 +257,11 @@ class Synchronization(commands.Cog):
         channel = self.bot.get_channel(payload.data['channel_id'])
         if (isinstance(channel, discord.DMChannel) or
                 isinstance(channel, discord.GroupChannel)):
-            print('FAILED TO UPDATE MESSAGE: Ignoring DMChannel/GroupChannel')
+            self.log.info('FAILED TO UPDATE MESSAGE: Ignoring DMChannel/GroupChannel')
             return
 
         if 'content' not in payload.data:
-            # print('FAILED TO UPDATE MESSAGE: '
-            #     'Embed only edit {}'.format(payload.message_id))
+            self.log.info('FAILED TO UPDATE MESSAGE: Embed only edit {}'.format(payload.message_id))
             return
 
         message_id = payload.message_id
@@ -285,13 +298,14 @@ class Synchronization(commands.Cog):
                    before.permissions_for(before.guild.me).read_messages)
             post = (after.permissions_for(after.guild.me).read_message_history and
                     after.permissions_for(after.guild.me).read_messages)
-            print('{}, {}'.format(pre, post))
+            self.log.info('Pre: {}, Post: {}'.format(pre, post))
+            self.log.info(before.guild)
             if pre is True and post is False:
                 await self._remove_text_channel(after)
-                print('Removing text channel')
+                self.log.info('Removing text channel')
             elif pre is False and post is True:
                 await self._add_text_channel(after)
-                print('Adding text channel')
+                self.log.info('Adding text channel')
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member) -> None:
@@ -301,12 +315,16 @@ class Synchronization(commands.Cog):
         for text_channel in after.guild.text_channels:
             pre_perm = text_channel.permissions_for(before).read_message_history
             post_perm = text_channel.permissions_for(after).read_message_history
+
+            self.log.info('Pre: {}, Post: {}'.format(pre_perm, post_perm))
+            self.log.info(before.guild)
+
             if pre_perm is True and post_perm is False:
                 await self._remove_text_channel(text_channel)
-                print('Removing text channel')
+                self.log.info('Removing text channel')
             elif pre_perm is False and post_perm is True:
                 await self._add_text_channel(text_channel)
-                print('Adding text channel')
+                self.log.info('Adding text channel')
 
     async def _add_messages(self, text_channel: discord.TextChannel, conn: asyncpg.Connection) -> None:
         msg_queue = list()
@@ -344,13 +362,13 @@ class Synchronization(commands.Cog):
                     msg_queue.clear()
 
                 if counter % 10000 == 0:
-                    print('Fetched 10000 messages from {} channel in {} '
-                          'server'.format(text_channel.name, text_channel.guild.name))
+                    self.log.info('Fetched 10000 messages from {} channel in {} '
+                                  'server'.format(text_channel.name, text_channel.guild.name))
 
             if counter % 10000 != 0:
-                print('Fetched {} messages from {} channel, '
-                      '{} server'.format((counter % 10000),
-                                         text_channel.name, text_channel.guild.name))
+                self.log.info('Fetched {} messages from {} channel, '
+                              '{} server'.format((counter % 10000),
+                                                 text_channel.name, text_channel.guild.name))
                 await conn.executemany(
                     'INSERT INTO statbot_db.MESSAGES '
                     'VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)',
@@ -368,8 +386,8 @@ class Synchronization(commands.Cog):
                     False
                 )
             except asyncpg.UniqueViolationError as e:
-                # print('FAILED TO ADD USER: Already exists in DB (expected)')
-                pass
+                self.log.info('FAILED TO ADD USER: Already exists in DB (expected)')
+                self.log.debug('{!r}: errno is {}'.format(e, e.args[0]))
 
             await conn.execute(
                 'INSERT INTO statbot_db.HAS_USERS VALUES ($1, $2)',
@@ -377,7 +395,7 @@ class Synchronization(commands.Cog):
                 member.id
             )
             counter += 1
-        print('Added {} users from {}'.format(counter, guild.name))
+        self.log.info('Added {} users from {}'.format(counter, guild.name))
 
     @commands.command(hidden=True, name='addguild')
     @commands.is_owner()
@@ -398,8 +416,9 @@ class Synchronization(commands.Cog):
                     True
                 )
             except asyncpg.UniqueViolationError as e:
-                print('This server already exists in the database')
-                print(e)
+                self.log.warning('This server already exists in the database')
+                self.log.warning(ctx.guild)
+                self.log.warning('{!r}: errno is {}'.format(e, e.args[0]))
                 return
 
             # Now add all users in server
@@ -413,12 +432,10 @@ class Synchronization(commands.Cog):
                     True
                 )
 
-                # if isinstance(text_channel, discord.ChannelType.private):
-                #     print('Skipping restricted channel')
-                #     continue
-
                 if text_channel.permissions_for(ctx.guild.me).read_message_history is False:
-                    print('Skipping restricted channel')
+                    self.log.info('Skipping restricted channel')
+                    self.log.debug(ctx.guild)
+                    self.log.debug(text_channel)
                     continue
 
                 await self._add_messages(text_channel, conn)
@@ -436,10 +453,10 @@ class Synchronization(commands.Cog):
                 False,
                 ctx.guild.id
             )
-            print('Server message transfer complete')
+            self.log.info('Server message transfer complete')
 
             end = time.time()
-            print(str(round((end - start) / 60, 2)) + ' minutes elapsed')
+            self.log.info(str(round((end - start) / 60, 2)) + ' minutes elapsed')
 
     @commands.command(hidden=True, name='removeguild')
     @commands.is_owner()
@@ -459,7 +476,8 @@ class Synchronization(commands.Cog):
                     ctx.guild.id
                 )
                 if row is None:
-                    print('Can\'t remove a server that\'s not in the database')
+                    self.log.warning('Can\'t remove a server that\'s not in the database')
+                    self.log.warning(ctx.guild)
                     return
 
                 await conn.execute(
@@ -468,10 +486,10 @@ class Synchronization(commands.Cog):
                     ctx.guild.id
                 )
 
-            print('Server removal complete')
+            self.log.info('Server removal complete')
 
             end = time.time()
-            print(str(round((end - start) / 60, 2)) + ' minutes elapsed')
+            self.log.info(str(round((end - start) / 60, 2)) + ' minutes elapsed')
 
     @commands.command(hidden=True, name='regeneratedb')
     @commands.is_owner()
