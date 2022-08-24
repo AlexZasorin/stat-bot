@@ -139,7 +139,7 @@ more methods of specifying user and channel targets such as in the `vocab` comma
 * [ ] `trend` command to generate graphs/graphics of keyword usage similar to 
 [Google Trends](https://trends.google.com/trends/?geo=US)
 * [ ] Introduce command error handlers
-* [ ] Introduce proper logging
+* [X] Introduce proper logging
 * [ ] Add support in database schema for Discord threads
 * [ ] Command cooldowns (per user & global)
 * [ ] Checking for missed messages, edits, and deletions after bot downtime
