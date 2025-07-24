@@ -32,7 +32,6 @@ available and can be specified by adding it as an argument to the command.
 
 Included mask arguments:
 - burger
-- cock
 - dog
 - egg
 - frog
